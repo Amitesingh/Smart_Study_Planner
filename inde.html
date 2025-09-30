@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Quest - Progress Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-item {
+            margin-bottom: 15px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #e0e7ff;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .todo-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .todo-input {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .todo-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .todo-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .todo-item.completed {
+            opacity: 0.7;
+            border-left-color: #10b981;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+        }
+
+        .todo-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .milestone {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 10px;
+            border-left: 4px solid #0ea5e9;
+            position: relative;
+        }
+
+        .milestone.completed {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-left-color: #10b981;
+        }
+
+        .milestone-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .milestone-text {
+            flex: 1;
+        }
+
+        .milestone-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .milestone-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .calendar-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            color: #666;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day:hover {
+            background: #e2e8f0;
+        }
+
+        .calendar-day.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #667eea;
+            font-weight: bold;
+        }
+
+        .achievement {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .level-indicator {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .floating-particle {
+            position: fixed;
+            pointer-events: none;
+            color: #667eea;
+            font-size: 2rem;
+            animation: float-up 2s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Learning Quest <span class="level-indicator" id="levelIndicator">Level 1</span></h1>
+            <p>Your personalized learning journey tracker</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalXP">0</div>
+                <div class="stat-label">Total XP</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="currentStreak">0</div>
+                <div class="stat-label">Day Streak</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="completedTasks">0</div>
+                <div class="stat-label">Tasks Done</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="overallProgress">0%</div>
+                <div class="stat-label">Overall Progress</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="section">
+                <div class="section-title">
+                    📈 Learning Progress
+                </div>
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>JavaScript Fundamentals</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>React Development</span>
+                            <span>45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Node.js Backend</span>
+                            <span>30%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4>Add New Subject:</h4>
+                    <div class="todo-input">
+                        <input type="text" id="subjectInput" placeholder="Subject name">
+                        <input type="number" id="progressInput" placeholder="Progress %" min="0" max="100">
+                        <button class="add-btn" onclick="addSubject()">Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    ✅ Daily Tasks
+                </div>
+                <div class="todo-input">
+                    <input type="text" id="todoInput" placeholder="Add a new task..." onkeypress="handleTodoKeyPress(event)">
+                    <button class="add-btn" onclick="addTodo()">Add</button>
+                </div>
+                <div class="todo-list" id="todoList">
+                    <!-- Tasks will be added here -->
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    🏆 Milestones
+                </div>
+                <div id="milestonesList">
+                    <div class="milestone completed">
+                        <div class="milestone-icon">🎉</div>
+                        <div class="milestone-text">
+                            <div class="milestone-title">First Week Complete!</div>
+                            <div class="milestone-desc">Completed 7 days of consistent learning</div>
+                        </div>
+                    </div>
+                    <div class="milestone">
+                        <div class="milestone-icon">🔥</div>
+                        <div class="milestone-text">
+                            <div class="milestone-title">30-Day Streak</div>
+                            <div class="milestone-desc">Maintain learning streak for 30 days</div>
+                        </div>
+                    </div>
+                    <div class="milestone">
+                        <div class="milestone-icon">📚</div>
+                        <div class="milestone-text">
+                            <div class="milestone-title">Knowledge Master</div>
+                            <div class="milestone-desc">Complete 100 learning tasks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    📅 Consistency Calendar
+                </div>
+                <div class="calendar" id="calendar">
+                    <!-- Calendar will be generated here -->
+                </div>
+            </div>
+
+            <div class="section full-width" id="achievementSection" style="display: none;">
+                <div class="achievement">
+                    <div class="achievement-icon">🎊</div>
+                    <h3>Achievement Unlocked!</h3>
+                    <p id="achievementText">Great job on your progress!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            xp: 0,
+            level: 1,
+            streak: 0,
+            completedTasks: 0,
+            subjects: [
+                { name: 'JavaScript Fundamentals', progress: 75 },
+                { name: 'React Development', progress: 45 },
+                { name: 'Node.js Backend', progress: 30 }
+            ],
+            todos: [],
+            activeDays: new Set(),
+            achievements: []
+        };
+
+        // Load saved data
+        function loadGameState() {
+            const saved = localStorage.getItem('learningQuestData');
+            if (saved) {
+                gameState = { ...gameState, ...JSON.parse(saved) };
+                gameState.activeDays = new Set(gameState.activeDays);
+            }
+        }
+
+        // Save data
+        function saveGameState() {
+            const toSave = {
+                ...gameState,
+                activeDays: Array.from(gameState.activeDays)
+            };
+            localStorage.setItem('learningQuestData', JSON.stringify(toSave));
+        }
+
+        // Update UI stats
+        function updateStats() {
+            document.getElementById('totalXP').textContent = gameState.xp;
+            document.getElementById('currentStreak').textContent = gameState.streak;
+            document.getElementById('completedTasks').textContent = gameState.completedTasks;
+            
+            // Calculate overall progress
+            const totalProgress = gameState.subjects.reduce((sum, subject) => sum + subject.progress, 0);
+            const overallProgress = gameState.subjects.length > 0 ? Math.round(totalProgress / gameState.subjects.length) : 0;
+            document.getElementById('overallProgress').textContent = overallProgress + '%';
+            
+            // Update level
+            const newLevel = Math.floor(gameState.xp / 100) + 1;
+            if (newLevel > gameState.level) {
+                gameState.level = newLevel;
+                showAchievement(`Level Up! You've reached Level ${newLevel}! 🎉`);
+                createParticleEffect('🎉');
+            }
+            document.getElementById('levelIndicator').textContent = `Level ${gameState.level}`;
+        }
+
+        // Add XP and create floating animation
+        function addXP(amount, element) {
+            gameState.xp += amount;
+            
+            // Create floating XP animation
+            const particle = document.createElement('div');
+            particle.className = 'floating-particle';
+            particle.textContent = `+${amount} XP`;
+            particle.style.left = (element.offsetLeft + element.offsetWidth / 2) + 'px';
+            particle.style.top = element.offsetTop + 'px';
+            document.body.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 2000);
+            
+            updateStats();
+            saveGameState();
+        }
+
+        // Show achievement
+        function showAchievement(text) {
+            const section = document.getElementById('achievementSection');
+            const textElement = document.getElementById('achievementText');
+            textElement.textContent = text;
+            section.style.display = 'block';
+            
+            setTimeout(() => {
+                section.style.display = 'none';
+            }, 3000);
+        }
+
+        // Create particle effect
+        function createParticleEffect(emoji) {
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'floating-particle';
+                    particle.textContent = emoji;
+                    particle.style.left = Math.random() * window.innerWidth + 'px';
+                    particle.style.top = Math.random() * window.innerHeight + 'px';
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        // Progress Management
+        function addSubject() {
+            const nameInput = document.getElementById('subjectInput');
+            const progressInput = document.getElementById('progressInput');
+            
+            if (nameInput.value && progressInput.value !== '') {
+                gameState.subjects.push({
+                    name: nameInput.value,
+                    progress: parseInt(progressInput.value) || 0
+                });
+                
+                nameInput.value = '';
+                progressInput.value = '';
+                
+                renderProgress();
+                addXP(10, nameInput);
+                saveGameState();
+            }
+        }
+
+        function renderProgress() {
+            const container = document.getElementById('progressContainer');
+            container.innerHTML = '';
+            
+            gameState.subjects.forEach((subject, index) => {
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.innerHTML = `
+                    <div class="progress-label">
+                        <span>${subject.name}</span>
+                        <span>${subject.progress}%</span>
+                        <button onclick="updateSubjectProgress(${index})" style="margin-left: 10px; padding: 4px 8px; border: none; border-radius: 4px; background: #667eea; color: white; cursor: pointer;">+5%</button>
+                        <button onclick="removeSubject(${index})" style="margin-left: 5px; padding: 4px 8px; border: none; border-radius: 4px; background: #ef4444; color: white; cursor: pointer;">×</button>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${subject.progress}%"></div>
+                    </div>
+                `;
+                container.appendChild(progressItem);
+            });
+            
+            updateStats();
+        }
+
+        function updateSubjectProgress(index) {
+            if (gameState.subjects[index]) {
+                gameState.subjects[index].progress = Math.min(100, gameState.subjects[index].progress + 5);
+                renderProgress();
+                addXP(15, document.querySelector('.progress-item'));
+                saveGameState();
+                
+                if (gameState.subjects[index].progress === 100) {
+                    showAchievement(`🎊 Congratulations! You've mastered ${gameState.subjects[index].name}!`);
+                    createParticleEffect('🌟');
+                }
+            }
+        }
+
+        function removeSubject(index) {
+            gameState.subjects.splice(index, 1);
+            renderProgress();
+            saveGameState();
+        }
+
+        // Todo Management
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            if (input.value.trim()) {
+                const todo = {
+                    id: Date.now(),
+                    text: input.value.trim(),
+                    completed: false,
+                    date: new Date().toDateString()
+                };
+                
+                gameState.todos.push(todo);
+                input.value = '';
+                renderTodos();
+                addXP(5, input);
+                saveGameState();
+            }
+        }
+
+        function handleTodoKeyPress(event) {
+            if (event.key === 'Enter') {
+                addTodo();
+            }
+        }
+
+        function toggleTodo(id) {
+            const todo = gameState.todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                if (todo.completed) {
+                    gameState.completedTasks++;
+                    addXP(20, document.querySelector(`[data-todo-id="${id}"]`));
+                    
+                    // Mark today as active
+                    const today = new Date().toDateString();
+                    gameState.activeDays.add(today);
+                    renderCalendar();
+                    
+                    // Check for streak
+                    updateStreak();
+                    
+                    // Check achievements
+                    checkAchievements();
+                } else {
+                    gameState.completedTasks--;
+                }
+                renderTodos();
+                updateStats();
+                saveGameState();
+            }
+        }
+
+        function deleteTodo(id) {
+            gameState.todos = gameState.todos.filter(t => t.id !== id);
+            renderTodos();
+            saveGameState();
+        }
+
+        function renderTodos() {
+            const container = document.getElementById('todoList');
+            container.innerHTML = '';
+            
+            gameState.todos.forEach(todo => {
+                const todoItem = document.createElement('div');
+                todoItem.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                todoItem.setAttribute('data-todo-id', todo.id);
+                todoItem.innerHTML = `
+                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} 
+                           onchange="toggleTodo(${todo.id})">
+                    <span class="todo-text">${todo.text}</span>
+                    <button class="delete-btn" onclick="deleteTodo(${todo.id})">Delete</button>
+                `;
+                container.appendChild(todoItem);
+            });
+        }
+
+        // Calendar Management
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
+            // Add day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-header';
+                header.textContent = day;
+                calendar.appendChild(header);
+            });
+            
+            // Get current month data
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            // Generate calendar days
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = currentDate.getDate();
+                
+                // Check if day is in current month
+                if (currentDate.getMonth() !== month) {
+                    dayElement.style.opacity = '0.3';
+                }
+                
+                // Check if day is today
+                if (currentDate.toDateString() === now.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Check if day is active (has completed tasks)
+                if (gameState.activeDays.has(currentDate.toDateString())) {
+                    dayElement.classList.add('active');
+                }
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        // Streak calculation
+        function updateStreak() {
+            const today = new Date();
+            let streak = 0;
+            
+            for (let i = 0; i < 365; i++) {
+                const checkDate = new Date(today);
+                checkDate.setDate(today.getDate() - i);
+                
+                if (gameState.activeDays.has(checkDate.toDateString())) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            gameState.streak = streak;
+            updateStats();
+        }
+
+        // Achievement checking
+        function checkAchievements() {
+            const achievements = [
+                { id: 'first_task', condition: () => gameState.completedTasks >= 1, message: 'First Task Complete! 🎉' },
+                { id: 'task_master', condition: () => gameState.completedTasks >= 10, message: 'Task Master! Completed 10 tasks! 🏆' },
+                { id: 'streak_week', condition: () => gameState.streak >= 7, message: 'Week Warrior! 7-day streak! 🔥' },
+                { id: 'streak_month', condition: () => gameState.streak >= 30, message: 'Monthly Master! 30-day streak! 👑' },
+                { id: 'xp_milestone', condition: () => gameState.xp >= 500, message: 'XP Champion! Reached 500 XP! ⭐' }
+            ];
+            
+            achievements.forEach(achievement => {
+                if (!gameState.achievements.includes(achievement.id) && achievement.condition()) {
+                    gameState.achievements.push(achievement.id);
+                    showAchievement(achievement.message);
+                    createParticleEffect('🎊');
+                    addXP(50, document.body);
+                }
+            });
+        }
+
+        // Initialize app
+        function initApp() {
+            loadGameState();
+            renderProgress();
+            renderTodos();
+            renderCalendar();
+            updateStats();
+            checkAchievements();
+        }
+
+        // Start the app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
